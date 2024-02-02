@@ -1,8 +1,7 @@
 let gameBoard = new Array(9);
-let player1 = createPlayer('Player 1', 'X');
-let player2 = createPlayer('Player 2','O');
 let buttonsPressed = 0;
 const restartBtn = document.querySelector('.restart');
+const startBtn = document.querySelector('.start');
 
 function createBoard() {
     const board = document.querySelector('.board');
@@ -14,11 +13,11 @@ function createBoard() {
     }
 }
 
-function play() {
-
-    playGame(player1);
+function play(player1, player2) {
+    startBtn.disabled = true;
+    playGame(player1, player1, player2);
 }
-function playGame(activePlayer) {
+function playGame(activePlayer, player1, player2) {
 
 
     const coord = document.querySelectorAll('.field');
@@ -34,12 +33,14 @@ function playGame(activePlayer) {
                 if (determineWin(activePlayer)) {
                     {
                         const winner = document.querySelector('.winner');
-                        winner.textContent = `${activePlayer.name} is the winner!`;
+                        winner.innerHTML = `${activePlayer.name} is the winner!`;
 
-                        const buttons = document.querySelectorAll("button");
+                        const buttons = document.querySelectorAll('.field');
                         for (const button of buttons) {
                             button.disabled = true;
                         }
+
+                        startBtn.disabled = false;
                         return;
                     }
                 }
@@ -49,12 +50,14 @@ function playGame(activePlayer) {
                 // if all buttons are pressed and the winner was not decided, it's a draw.
                 if (buttonsPressed === 9) {
                     const winner = document.querySelector('.winner');
-                    winner.textContent = "It's a draw!";
+                    winner.innerHTML = "It's a draw!";
 
                     const buttons = document.querySelectorAll('.field');
                     for (const button of buttons) {
                         button.disabled = true;
                     }
+
+                    startBtn.disabled = false;
                     return;
                 }
 
@@ -96,17 +99,7 @@ function playGame(activePlayer) {
     }
 }
 
-restartBtn.addEventListener('click', () => {
-    gameBoard = new Array(9);
-    buttonsPressed = 0;
-    const fields = document.querySelectorAll('.field');
-    fields.forEach((field) => {
-        field.textContent = '';
-    });
 
-    play();
-
-})
 
 function createPlayer(name, marker) {
 
@@ -116,8 +109,48 @@ function createPlayer(name, marker) {
     return { name, marker };
 }
 
-createBoard();
-play();
+
+function start() {
+
+    let player1;
+    let player2;
+
+    startBtn.addEventListener('click', () => {
+
+        const board = document.querySelector('.board');
+        gameBoard = new Array(9);
+        buttonsPressed = 0;
+        board.replaceChildren();
+
+        const p1 = document.getElementById('p1');
+        const p2 = document.getElementById('p2');
+        player1 = createPlayer(p1.value, 'X');
+        player2 = createPlayer(p2.value, 'O');
 
 
+        createBoard();
+        play(player1, player2);
+    });
 
+
+    restartBtn.addEventListener('click', () => {
+        gameBoard = new Array(9);
+        buttonsPressed = 0;
+        const fields = document.querySelectorAll('.field');
+        fields.forEach((field) => {
+            field.textContent = '';
+        });
+        const winner = document.querySelector('.winner');
+        winner.textContent = '';
+
+        const buttons = document.querySelectorAll('.field');
+        for (const button of buttons) {
+            button.disabled = false;
+        }
+
+        play(player1, player2);
+
+    });
+}
+
+start();
